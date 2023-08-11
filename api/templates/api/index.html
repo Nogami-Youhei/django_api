@@ -1,16 +1,45 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'api/css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Noto+Serif+JP:wght@200&display=swap" rel="stylesheet">
     <title>Document</title>
 </head>
 <body>
-    <form action="{% url 'index' %}" method="post">
+    <h1>研究報告書データベース</h1>
+    <div class="wrapper">
+    <div>
+    <form action="{% url 'index' %}" method="post" id="report">
     {% csrf_token %}
-    {{ form.description.label_tag }}
-    {{ form.description }}
-    <input type="submit" value="送信">
+    <table>
+    <tr><th colspan="2">登録</th></tr>
+    {{ report_form }}
+    <tr><td></td><td><input type="button" value="登録" id="report_btn"></td></tr>
+    </table>
     </form>
+    <div id="status"></div>
+    </div>
+
+    <form action="{% url 'search' %}" method="post" id="search">
+    {% csrf_token %}
+    <table>
+    <tr><th colspan="2">検索</th></tr>
+    {{ search_form }}
+    <tr><td></td><td><input type="button" value="検索" id="search_btn"></td>
+    </table>
+    </form>
+    <div id="result"></div>
+    </div>
+    <div id="box">
+        <p id="close">×</p>
+        <div id="detail_result"></div>
+    </div>
+    <div id="fadeLayer"></div>
+    <script src="{% static 'api/js/index.js' %}"></script>
 </body>
 </html>
