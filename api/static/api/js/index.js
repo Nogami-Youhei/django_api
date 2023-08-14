@@ -163,6 +163,10 @@ async function Search(event, loading) {
                 document.getElementById('status').innerHTML = '失敗';
             }
         }));
+
+        const box_btn = Array.from(document.getElementsByClassName('box_btn'));
+        box_btn.forEach((v) => v.addEventListener('click', Box));
+
     } else {
         document.getElementById('result').innerHTML = '失敗';
     }
@@ -200,6 +204,22 @@ async function Output() {
       } catch (error) {
         console.error('ダウンロード失敗', error);
       }
+    }
+
+async function Box() {
+    const boxForm = document.getElementById('box');
+	const endPoint = boxForm.action;
+    const response = await fetch(endPoint, {
+        method: 'POST',
+        body: new FormData(boxForm)
+    });
+        const res = await response.json();
+
+        if (res.status === 'success') {
+            location.href = res.url;
+        } else {
+            console.log('error');
+        }
     }
 
 document.addEventListener('DOMContentLoaded', function() {

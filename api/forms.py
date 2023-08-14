@@ -17,7 +17,7 @@ class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
 class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
-        exclude = ['name', 'smile_id', 'datetime']
+        exclude = ['name', 'smile_id', 'datetime', 'readers', 'readers_number']
 
         labels = {
             'title': 'タイトル',
@@ -26,9 +26,10 @@ class ReportForm(forms.ModelForm):
         }
      
         widgets = {
-            'abstract': forms.Textarea(attrs={'rows':10, 'cols':25}),
+            'abstract': forms.Textarea,
             'categories': CustomCheckboxSelectMultiple,
         }
+
 
 class CustomSelectDateWidget(forms.SelectDateWidget):
     def get_context(self, name, value, attrs):
@@ -79,6 +80,16 @@ class SearchForm(forms.Form):
     categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='カテゴリ')
     start_date = forms.DateField(widget=CustomSelectDateWidget(years=range(2000, 2030)), label='開始')
     end_date = forms.DateField(initial=localtime(timezone.now()), widget=CustomSelectDateWidget(years=range(2000, 2030)), label='終了')
+    sort = forms.fields.ChoiceField(
+        label='取得順',
+        choices = (
+            ('0', '登録日[新しい順]'),
+            ('1', '登録日[古い順]'),
+            ('2', '報告書名順'),
+            ('3', '閲覧者数順[多い順]'),
+        ),
+        widget=forms.widgets.Select(attrs={'class': 'select'})
+    )
 
 
 User = get_user_model()

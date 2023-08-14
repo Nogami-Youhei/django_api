@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import ReportForm, SearchForm
 from .models import Report
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse, FileResponse, JsonResponse
 from django.utils import timezone
 import datetime
 import pytz
@@ -123,6 +123,7 @@ def search_result(keywords, categories, start_date, end_date):
         start_date = timezone.localize(start_date)
         end_date = timezone.localize(end_date)
         items = items.filter(datetime__range=(start_date, end_date))
+
     items = items.distinct()
     return items
 
@@ -137,8 +138,19 @@ def search(request):
         categories = form.cleaned_data.get('categories')
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
+        sort = form.cleaned_data.get('sort')
 
         items = search_result(keywords, categories, start_date, end_date)
+
+        if sort == '1':
+            items = items.order_by('datetime')
+
+        elif sort == '2':
+            items = items.order_by('title')
+
+        elif sort == '3':
+            items = items.order_by('readers_number')
+            
         paginator = Paginator(items, 8)
         number = request.POST.get('p', 1)
         items = paginator.page(number)
@@ -160,10 +172,15 @@ def detail(request):
     id = request.POST.get('detail')
     report = Report.objects.get(id=id)
     categories = report.categories.all()
+    users = report.readers.all()
     categories = [category.name for category in categories]
+    users = [user.last_name + ' ' + user.first_name for user in users]
+    readers_number = report.readers_number
     params = {
         'report': report,
         'categories': categories,
+        'users': users,
+        'readers_number': readers_number,
     }
 
     return render(request, 'api/detail.html', params)
@@ -195,6 +212,24 @@ def update(request):
         'id': id,
     }
     return render(request, 'api/update.html', params)
+
+
+@login_required
+def box(request):
+    id = request.POST.get('box')
+    report = Report.objects.get(id=id)
+    user = request.user
+    report.readers.add(user)
+    readers = report.readers.all()
+    report.readers_number = readers.count()
+    report.save()
+
+    result = {
+        'status': 'success',
+        'url': report.box_url,
+    }
+    
+    return JsonResponse(result)
 
 
 @login_required

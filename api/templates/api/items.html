@@ -15,7 +15,13 @@
     <td>{{ item.name }}</td>
     <td>{{ item.title }}</td>
     <td>{{ item.datetime | date }}</td>
-    <td><a id="url" href="{{ item.box_url }}">BOX</a></td>
+    <td>
+    <form action="{% url 'box' %}" method="post" id="box">
+    {% csrf_token %}
+    <input type="hidden" value="{{ item.id }}" name="box">
+    <input id="url" type="button" class="box_btn" value="BOX">
+    </form>
+    </td>
     <td>
     <form action="{% url 'detail' %}" method="post" id="detail">
     {% csrf_token %}

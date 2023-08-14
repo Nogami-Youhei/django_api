@@ -9,6 +9,10 @@ class Category(models.Model):
         return self.name
 
 
+class CustomUser(AbstractUser):
+    pass
+
+
 class Report(models.Model):
     name = models.CharField(max_length=255)
     smile_id = models.CharField(max_length=255)
@@ -16,11 +20,9 @@ class Report(models.Model):
     abstract = models.CharField(max_length=255)
     box_url = models.URLField(max_length=255)
     datetime = models.DateTimeField(auto_now_add=True)
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField(Category, blank=True)
+    readers = models.ManyToManyField(CustomUser)
+    readers_number = models.IntegerField(null=True)
     
     class Meta:
         ordering = ['-datetime']
-
-
-class CustomUser(AbstractUser):
-    pass

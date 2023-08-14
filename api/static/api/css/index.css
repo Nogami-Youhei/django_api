@@ -13,10 +13,6 @@ a {
   text-decoration: none;
 }
 
-img {
-  max-width: 100%;
-}
-
 .main-nav {
   display: flex;
   font-size: 1.25rem;
@@ -81,7 +77,7 @@ img {
 
 #status, #status2{
   font-size: 1.2em;
-  margin-left: 5em;
+  text-align: center;
   color: #27acd9;
 }
 
@@ -100,7 +96,7 @@ img {
 
 [type='text'], textarea, [type='url'], #id_password1, #id_password2 {
   display: block;
-  width: 90%;
+  width: 12rem;
   height: 30px;
   padding: 5px 5%;
   border: 1px solid #ccc;
