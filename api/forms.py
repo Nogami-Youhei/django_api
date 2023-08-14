@@ -2,6 +2,7 @@ from django import forms
 from .models import Report, Category
 from django.forms.widgets import CheckboxSelectMultiple
 from django.utils import timezone
+from datetime import timedelta
 from django.utils.timezone import localtime
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
@@ -79,7 +80,7 @@ class SearchForm(forms.Form):
     keyword = forms.CharField(max_length=255, required=False, label='キーワード')
     categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='カテゴリ')
     start_date = forms.DateField(widget=CustomSelectDateWidget(years=range(2000, 2030)), label='開始')
-    end_date = forms.DateField(initial=localtime(timezone.now()), widget=CustomSelectDateWidget(years=range(2000, 2030)), label='終了')
+    end_date = forms.DateField(initial=timezone.now() + timedelta(hours=9), widget=CustomSelectDateWidget(years=range(2000, 2030)), label='終了')
     sort = forms.fields.ChoiceField(
         label='取得順',
         choices = (

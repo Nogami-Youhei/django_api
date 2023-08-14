@@ -96,7 +96,7 @@ a {
 
 [type='text'], textarea, [type='url'], #id_password1, #id_password2 {
   display: block;
-  width: 12rem;
+  width: 11rem;
   height: 30px;
   padding: 5px 5%;
   border: 1px solid #ccc;

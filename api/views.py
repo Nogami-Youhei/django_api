@@ -217,13 +217,14 @@ def update(request):
 @login_required
 def box(request):
     id = request.POST.get('box')
+    print(id)
     report = Report.objects.get(id=id)
     user = request.user
     report.readers.add(user)
     readers = report.readers.all()
     report.readers_number = readers.count()
     report.save()
-
+    print(report.box_url)
     result = {
         'status': 'success',
         'url': report.box_url,
@@ -249,8 +250,10 @@ def output(request):
         os.makedirs(temp_dir, exist_ok=True)
         file_dir = temp_dir.joinpath('result.xlsx')
         df = pd.DataFrame(list(items.values()))
+        print(items.values())
+        print(df)
         df['datetime'] = df['datetime'].dt.tz_localize(None)+ pd.Timedelta(hours=9)
-        df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時']
+        df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時', '閲覧者数']
         df.to_excel(file_dir)
 
         wb = openpyxl.load_workbook(file_dir)

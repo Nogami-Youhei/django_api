@@ -206,8 +206,8 @@ async function Output() {
       }
     }
 
-async function Box() {
-    const boxForm = document.getElementById('box');
+async function Box(e) {
+    const boxForm = e.target.parentElement;
 	const endPoint = boxForm.action;
     const response = await fetch(endPoint, {
         method: 'POST',
@@ -216,7 +216,7 @@ async function Box() {
         const res = await response.json();
 
         if (res.status === 'success') {
-            location.href = res.url;
+            window.open(res.url);
         } else {
             console.log('error');
         }
