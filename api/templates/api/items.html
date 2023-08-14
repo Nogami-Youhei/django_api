@@ -1,12 +1,21 @@
+<div>
 <table>
-    <tr><th>ID</th><th>氏名</th><th>タイトル</th><th>URL</th><th>登録日時</th><th>詳細</th><th>削除</th></tr>
+    <col width="5%">
+    <col width="15%">
+    <col width="20%">
+    <col width="20%">
+    <col width="10%">
+    <col width="10%">
+    <col width="10%">
+    <col width="10%">
+    <tr><th>ID</th><th>氏名</th><th>タイトル</th><th>登録日時</th><th>URL</th><th>詳細</th><th>編集</th><th>削除</th></tr>
     {% for item in items %}
     <tr>
-    <td>{{ forloop.counter }}</td>
+    <td>{{ item.id }}</td>
     <td>{{ item.name }}</td>
     <td>{{ item.title }}</td>
-    <td><a href="{{ item.box_url }}">BOX_URL</a></td>
-    <td>{{ item.datetime }}</td>
+    <td>{{ item.datetime | date }}</td>
+    <td><a id="url" href="{{ item.box_url }}">BOX</a></td>
     <td>
     <form action="{% url 'detail' %}" method="post" id="detail">
     {% csrf_token %}
@@ -15,14 +24,52 @@
     </form>
     </td>
     <td>
+    {% if smile_id == item.smile_id %}
+    <form action="{% url 'update' %}" method="post" id="update">
+    {% csrf_token %}
+    <input type="hidden" value="{{ item.id }}" name="update">
+    <input type="button" class="update_btn" value="編集">
+    </form>
+    {% endif %}
+    </td><td>
+    {% if smile_id == item.smile_id %}
     <form action="{% url 'delete' %}" method="post" id="delete">
     {% csrf_token %}
     <input type="hidden" value="{{ item.id }}" name="delete">
     <input type="button" class="delete_btn" value="削除">
     </form>
+    {% endif %}
     </td>
     </tr>
     {% empty %}
-    <tr><td>該当する項目はありません。</td></tr>
+    <tr><td colspan="8">該当する項目はありません。</td></tr>
     {% endfor %}
 </table>
+
+<div class="page-wrapper">
+{% if items.has_previous %}
+    <input type="hidden" value="1">
+    <input type="button" class="search right" value="<<最初">
+
+    <input type="hidden" value="{{ items.previous_page_number }}">
+    <input type="button" class="search left" value="前へ">
+
+{% else %}
+    <input type="button" class="hover right" value="<<最初">
+    <input type="button" class="hover left" value="前へ">
+{% endif %}
+<p class="page">
+    {{ items.number }} / {{ items.paginator.num_pages }}
+</p>
+{% if items.has_next %}
+    <input type="hidden" value="{{ items.next_page_number }}">
+    <input type="button" class="search right" value="次へ">
+
+    <input type="hidden" value="{{ items.paginator.num_pages }}">
+    <input type="button" class="search left" value="最後>>">
+{% else %}
+    <input type="button" class="hover right" value="次へ">
+    <input type="button" class="hover left" value="最後>>">
+{% endif %}
+</div>
+</div>

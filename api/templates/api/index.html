@@ -4,42 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'api/css/style.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Noto+Serif+JP:wght@200&display=swap" rel="stylesheet">
-    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'api/css/index.css' %}">
+    <title>研究報告書データベース</title>
 </head>
 <body>
-    <h1>研究報告書データベース</h1>
+    <header class="page-header wrapper">
+        <h1>研究報告書データベース</h1>
+        <nav>
+            <ul class="main-nav">
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
     <div class="wrapper">
+    <div class="wrapper2">
     <div>
     <form action="{% url 'index' %}" method="post" id="report">
     {% csrf_token %}
     <table>
     <tr><th colspan="2">登録</th></tr>
     {{ report_form }}
-    <tr><td></td><td><input type="button" value="登録" id="report_btn"></td></tr>
     </table>
+    <input type="button" value="登録" id="report-btn">
     </form>
     <div id="status"></div>
     </div>
 
+    <div>
     <form action="{% url 'search' %}" method="post" id="search">
-    {% csrf_token %}
     <table>
     <tr><th colspan="2">検索</th></tr>
+    {% csrf_token %}
     {{ search_form }}
-    <tr><td></td><td><input type="button" value="検索" id="search_btn"></td>
+    <tr>
     </table>
+    <input type="hidden" value="1">
+    <input type="button" value="検索" id="search-btn">
     </form>
-    <div id="result"></div>
+    <form action="{% url 'output' %}" method="post" id="output">
+    {% csrf_token %}
+    <input type="button" value="出力" id="output-btn">
+    </form>
     </div>
-    <div id="box">
-        <p id="close">×</p>
-        <div id="detail_result"></div>
+
+    <div id="result"><p id="placeholder">検索結果はこちらに表示されます</p></div>
     </div>
-    <div id="fadeLayer"></div>
+    <div id="popup-window" class="hidden">
+        <div id="popup-background"></div>
+        <div id="popup-content">
+        <div id="close">×</div>
+        <div id="detail-result"></div>
+    </div>
+    </div>
+    </div>
     <script src="{% static 'api/js/index.js' %}"></script>
 </body>
 </html>

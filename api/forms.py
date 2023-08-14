@@ -3,19 +3,21 @@ from .models import Report, Category
 from django.forms.widgets import CheckboxSelectMultiple
 from django.utils import timezone
 from django.utils.timezone import localtime
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import get_user_model
 
 class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
-        option['attrs']['id'] = f"custom_checkbox_{value}"
+        timestamp = timezone.now().timestamp()
+        option['attrs']['id'] = f"{value}_{timestamp}"
         return option
 
 
 class ReportForm(forms.ModelForm):
-
     class Meta:
         model = Report
-        exclude = ['datetime']
+        exclude = ['name', 'smile_id', 'datetime']
 
         labels = {
             'title': 'タイトル',
@@ -24,7 +26,7 @@ class ReportForm(forms.ModelForm):
         }
      
         widgets = {
-            'abstract': forms.Textarea(attrs={'rows':6, 'cols':22}),
+            'abstract': forms.Textarea(attrs={'rows':10, 'cols':25}),
             'categories': CustomCheckboxSelectMultiple,
         }
 
@@ -73,8 +75,26 @@ class CustomSelectDateWidget(forms.SelectDateWidget):
         return context
 
 class SearchForm(forms.Form):
-
     keyword = forms.CharField(max_length=255, required=False, label='キーワード')
     categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='カテゴリ')
     start_date = forms.DateField(widget=CustomSelectDateWidget(years=range(2000, 2030)), label='開始')
     end_date = forms.DateField(initial=localtime(timezone.now()), widget=CustomSelectDateWidget(years=range(2000, 2030)), label='終了')
+
+
+User = get_user_model()
+
+class SignupForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'last_name', 'first_name', 'password1', 'password2']
+
+
+class LoginForm(AuthenticationForm):
+    error_messages = {
+        'invalid_login': (
+            "ユーザー名またはパスワードが違います。"
+        ),
+        'inactive': ("このアカウントは無効です。"),
+    }
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-style'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-style'}))

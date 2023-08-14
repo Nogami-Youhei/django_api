@@ -27,11 +27,11 @@ async function Register() {
 	const form = document.getElementById('report');
 	
 	const endPoint = form.action;
-    const apiRes = await fetch(endPoint, {
+    const response = await fetch(endPoint, {
         method: 'POST',
         body: new FormData(form)
     });
-	const res = await apiRes.text();
+	const res = await response.text();
     if (res === 'success') {
         document.getElementById('status').textContent = '登録完了しました';
         Array.from(document.getElementsByClassName('errorlist')).forEach((v) => {
@@ -39,68 +39,61 @@ async function Register() {
         })
     } else {
         document.body.innerHTML = res;
-        const btn_register = document.getElementById('report_btn');
-        btn_register.addEventListener('click', Register);
-        const btn_search = document.getElementById('search_btn');
-        btn_search.addEventListener('click', Search);
+        const report_btn = document.getElementById('report-btn');
+        report_btn.addEventListener('click', Register);
+        const search_btn = document.getElementById('search-btn');
+        search_btn.addEventListener('click', function(event) { Search(event, true) });
+        const output_btn = document.getElementById('output-btn');
+        output_btn.addEventListener('click', Output);
     }
 }
 
 
-async function Search() {
-    replaceOrAddChild(document.getElementById('result'), div1);
-	
+async function Search(event, loading) {
+    if (loading === true) {
+        replaceOrAddChild(document.getElementById('result'), div1);
+    }
 	const form = document.getElementById('search');
+	let formData = new FormData(form);
+    formData.append('p', event.target.previousElementSibling.value);
 	
 	const endPoint = form.action;
-    const apiRes = await fetch(endPoint, {
+    const response = await fetch(endPoint, {
         method: 'POST',
-        body: new FormData(form)
+        body: formData
     });
-	const res = await apiRes.text();
+	const res = await response.text();
 
     if (res.trim()[0] === '<') {
         document.getElementById('result').innerHTML = res;
+        const btn_search = document.getElementsByClassName('search');
+        Array.from(btn_search).forEach((v) => v.addEventListener('click', function(event) { Search(event, false) }));
+
         const detail_btn = Array.from(document.getElementsByClassName('detail_btn'));
         detail_btn.forEach((v) => v.addEventListener('click', async function Detail() {
-            replaceOrAddChild(document.getElementById('detail_result'), div1);
-            let box = document.getElementById("box");
-            let close = document.getElementById("close");
-            
-            let boxstyle = box.style;
-            boxstyle.display = "block";
-            let target = document.getElementById("fadeLayer");
-            
-            let maxheightA = Math.max(document.body.clientHeight, document.body.scrollHeight)
-            let maxheightB = Math.max(document.documentElement.scrollHeight, document.documentElement.clientHeight)
-            let MaxHeight = Math.max(maxheightA,maxheightB);
-            target.style.height = MaxHeight+"px";
-            
-            let maxwidthA = Math.max(document.body.clientWidth, document.body.scrollWidth)
-            let maxwidthB = Math.max(document.documentElement.scrollWidth, document.documentElement.clientWidth)
-            let MaxWidth = Math.max(maxwidthA, maxwidthB);
-            target.style.width = MaxWidth + "px";
-            target.style.visibility = "visible";
+            replaceOrAddChild(document.getElementById('detail-result'), div1);
+
+            let target = document.getElementById("popup-window");
+            let close = document.getElementById('close');
+            target.classList.remove('hidden');
 
             close.addEventListener('click', function() {
-                boxstyle.display = "none";
-                let target = document.getElementById("fadeLayer");
-                target.style.visibility = "hidden";
-                document.getElementById('detail_result').innerHTML = '';
+                target.classList.add('hidden')
+                document.getElementById('detail-result').innerHTML = '';
             });
 
             const form = this.parentElement;
             const endPoint = form.action;
-            const apiRes = await fetch(endPoint, {
+            const response = await fetch(endPoint, {
                 method: 'POST',
                 body: new FormData(form)
             });
-            const res = await apiRes.text();
+            const res = await response.text();
         
             if (res.trim()[0] === '<') {
-                document.getElementById('detail_result').innerHTML = res;
+                document.getElementById('detail-result').innerHTML = res;
             } else {
-                document.getElementById('detail_result').innerHTML = 失敗;
+                document.getElementById('detail-result').innerHTML = '失敗';
             }
         }));
 
@@ -109,16 +102,65 @@ async function Search() {
 
             const form = this.parentElement;
             const endPoint = form.action;
-            const apiRes = await fetch(endPoint, {
+            const response = await fetch(endPoint, {
                 method: 'POST',
                 body: new FormData(form)
             });
-            const res = await apiRes.text();
+            const res = await response.text();
         
             if (res === 'delete') {
-                this.parentElement.parentElement.parentElement.innerHTML = '';
+                Search(event, false)
             } else {
-                document.getElementById('detail_result').innerHTML = 失敗;
+                document.getElementById('status').innerHTML = '失敗';
+            }
+        }));
+
+        const update_btn = Array.from(document.getElementsByClassName('update_btn'));
+        update_btn.forEach((v) => v.addEventListener('click', async function Update() {
+
+            const id = this.previousElementSibling.value;
+            const endPoint = `/api/update/?id=${id}`;
+            const response = await fetch(endPoint, {
+                method: 'GET',
+            });
+            const res = await response.text();
+        
+            if (res.trim()[0] === '<') {
+
+            replaceOrAddChild(document.getElementById('detail-result'), div1);
+
+            let target = document.getElementById("popup-window");
+            let close = document.getElementById('close');
+            target.classList.remove('hidden');
+
+            close.addEventListener('click', function() {
+                target.classList.add('hidden')
+                document.getElementById('detail-result').innerHTML = '';
+            });
+            
+            document.getElementById('detail-result').innerHTML = res;
+
+            const update_btn2 = document.getElementById('update_btn2')
+            update_btn2.addEventListener('click', async function Update2() {
+            document.getElementById('status2').textContent = '更新中...'
+            const form = document.getElementById('update2');
+            const endPoint = form.action;
+            const response = await fetch(endPoint, {
+                method: 'POST',
+                body: new FormData(form)
+            });
+            const res = await response.text();
+        
+            if (res === 'success') {
+                Search(event, false)
+                document.getElementById('status2').textContent = '更新完了'
+            } else {
+                document.getElementById('status2').innerHTML = '失敗';
+            }
+            });
+
+            } else {
+                document.getElementById('status').innerHTML = '失敗';
             }
         }));
     } else {
@@ -127,9 +169,44 @@ async function Search() {
 }
 
 
+async function Output() {
+    const searchForm = document.getElementById('search');
+	const outputForm = document.getElementById('output');
+	let formData = new FormData(searchForm);
+	const endPoint = outputForm.action;
+    try {
+    const response = await fetch(endPoint, {
+        method: 'POST',
+        body: formData
+    });
+        const blobData = await response.blob();
+    
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blobData);
+        a.href = url;
+        
+        let keyword =  formData.get('keyword')
+
+        if (keyword) {
+            a.download = formData.get('keyword') + '.xlsx';
+        } else {
+            a.download = 'キーワード無し.xlsx';
+        }
+        
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('ダウンロード失敗', error);
+      }
+    }
+
 document.addEventListener('DOMContentLoaded', function() {
-	const btn_register = document.getElementById('report_btn');
-	btn_register.addEventListener('click', Register);
-    const btn_search = document.getElementById('search_btn');
-    btn_search.addEventListener('click', Search);
+	const report_btn = document.getElementById('report-btn');
+	report_btn.addEventListener('click', Register);
+    const search_btn = document.getElementById('search-btn');
+    search_btn.addEventListener('click', function(event) { Search(event, true) });
+    const output_btn = document.getElementById('output-btn');
+    output_btn.addEventListener('click', Output);
 }, false);

@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class Category(models.Model):
@@ -16,3 +17,10 @@ class Report(models.Model):
     box_url = models.URLField(max_length=255)
     datetime = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(Category)
+    
+    class Meta:
+        ordering = ['-datetime']
+
+
+class CustomUser(AbstractUser):
+    pass
