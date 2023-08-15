@@ -22,7 +22,7 @@ class Report(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
     categories = models.ManyToManyField(Category, blank=True)
     readers = models.ManyToManyField(CustomUser)
-    readers_number = models.IntegerField(null=True)
+    readers_number = models.IntegerField(default=0)
     
     class Meta:
         ordering = ['-datetime']

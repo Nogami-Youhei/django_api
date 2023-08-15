@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'api/css/index.css' %}">
+    <link rel="icon" href="/static/api/img/favicon.png" type="image/png">
     <title>研究報告書データベース</title>
 </head>
 <body>
@@ -12,11 +13,12 @@
         <h1>研究報告書データベース</h1>
         <nav>
             <ul class="main-nav">
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'logout' %}" id="logout">Logout</a></li>
             </ul>
         </nav>
     </header>
     <div class="wrapper">
+        <p>ようこそ{{ user }}さん</p>
     <div class="wrapper2">
     <div>
     <form action="{% url 'index' %}" method="post" id="report">

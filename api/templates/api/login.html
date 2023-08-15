@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'api/css/login.css' %}">
+    <link rel="icon" href="/static/api/img/favicon.png" type="image/png">
     <title>login</title>
 </head>
     <script src="https://code.jquery.com/jquery-2.1.0.min.js" ></script>
@@ -22,7 +23,7 @@
     </div>
         <form action="{% url 'login' %}" method="post">
         <div class="form-item">
-          <p class="formLabel">username</p>
+          <p class="formLabel">UserID</p>
           {% csrf_token %}
           {{ form.username }}
         </div>

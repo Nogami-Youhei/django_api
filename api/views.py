@@ -35,6 +35,7 @@ def signup_view(request):
         }
     return render(request, 'api/signup.html', param)
 
+
 def login_view(request):
     if request.method == 'POST':
         next = request.POST.get('next')
@@ -61,6 +62,7 @@ def login_view(request):
 
     return render(request, 'api/login.html', params)
 
+
 def logout_view(request):
     logout(request)
     return redirect('login')
@@ -68,6 +70,9 @@ def logout_view(request):
 
 @login_required
 def index(request):
+
+    user = request.user.last_name + ' ' + request.user.first_name
+
     if request.method == 'POST':
         form = ReportForm(request.POST)
 
@@ -85,6 +90,7 @@ def index(request):
         else:
             search_form = SearchForm()
             params = {
+                'user': user,
                 'report_form': form,
                 'search_form': search_form,
             }
@@ -94,6 +100,7 @@ def index(request):
     report_form = ReportForm()
     
     params = {
+        'user': user,
         'report_form': report_form,
         'search_form': search_form,
     }
@@ -149,7 +156,7 @@ def search(request):
             items = items.order_by('title')
 
         elif sort == '3':
-            items = items.order_by('readers_number')
+            items = items.order_by('-readers_number')
             
         paginator = Paginator(items, 8)
         number = request.POST.get('p', 1)
@@ -243,8 +250,19 @@ def output(request):
         categories = form.cleaned_data.get('categories')
         start_date = form.cleaned_data.get('start_date')
         end_date = form.cleaned_data.get('end_date')
+        sort = form.cleaned_data.get('sort')
 
         items = search_result(keywords, categories, start_date, end_date)
+
+        if sort == '1':
+            items = items.order_by('datetime')
+
+        elif sort == '2':
+            items = items.order_by('title')
+
+        elif sort == '3':
+            items = items.order_by('-readers_number')
+
         temp_dir = THIS_FOLDER.joinpath('temp')
         shutil.rmtree(temp_dir)
         os.makedirs(temp_dir, exist_ok=True)
@@ -290,5 +308,3 @@ def output(request):
         wb.save(file_dir)
         filename, filepath = f'{keywords}.xlsx', file_dir
         return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filename)
-
-

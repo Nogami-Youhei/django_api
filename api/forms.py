@@ -21,9 +21,9 @@ class ReportForm(forms.ModelForm):
         exclude = ['name', 'smile_id', 'datetime', 'readers', 'readers_number']
 
         labels = {
-            'title': 'タイトル',
+            'title': '題目',
             'abstract': '要約',
-            'categories': 'カテゴリ',
+            'categories': '分野',
         }
      
         widgets = {
@@ -77,8 +77,8 @@ class CustomSelectDateWidget(forms.SelectDateWidget):
         return context
 
 class SearchForm(forms.Form):
-    keyword = forms.CharField(max_length=255, required=False, label='キーワード')
-    categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='カテゴリ')
+    keyword = forms.CharField(max_length=255, required=False, label='ワード')
+    categories = forms.ModelMultipleChoiceField(queryset=Category.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label='分野')
     start_date = forms.DateField(widget=CustomSelectDateWidget(years=range(2000, 2030)), label='開始')
     end_date = forms.DateField(initial=timezone.now() + timedelta(hours=9), widget=CustomSelectDateWidget(years=range(2000, 2030)), label='終了')
     sort = forms.fields.ChoiceField(
@@ -99,6 +99,10 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'last_name', 'first_name', 'password1', 'password2']
+
+        labels = {
+            'username': 'Sから始まるID',
+        }
 
 
 class LoginForm(AuthenticationForm):
