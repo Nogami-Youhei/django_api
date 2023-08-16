@@ -4,7 +4,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import localtime
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm, SetPasswordForm
 from django.contrib.auth import get_user_model
 
 class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
@@ -27,7 +27,9 @@ class ReportForm(forms.ModelForm):
         }
      
         widgets = {
-            'abstract': forms.Textarea,
+            'title': forms.TextInput(attrs={'placeholder': '50文字以内'}),
+            'abstract': forms.Textarea(attrs={'placeholder': '200文字以内'}),
+            'box_url': forms.TextInput(attrs={'placeholder': 'https://sekisui.box.com/...'}),
             'categories': CustomCheckboxSelectMultiple,
         }
 
@@ -114,3 +116,19 @@ class LoginForm(AuthenticationForm):
     }
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-style'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-style'}))
+
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ['username', 'last_name', 'first_name']
+        exclude = ['password']
+
+        labels = {
+            'username': 'Sから始まるID',
+        }
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    class Meta:
+        model = User

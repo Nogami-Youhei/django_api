@@ -1,15 +1,13 @@
 from django.shortcuts import render, redirect
-from .forms import ReportForm, SearchForm
-from .models import Report
+from .forms import ReportForm, SearchForm, SignupForm, LoginForm, CustomUserChangeForm, CustomSetPasswordForm
+from .models import Report, Category
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.utils import timezone
 import datetime
 import pytz
 from django.db.models import Q
 from django.core.paginator import Paginator
-from .forms import SignupForm, LoginForm
 from django.contrib.auth import login, logout
-from .forms import SignupForm, LoginForm
 from django.contrib.auth.decorators import login_required
 import os
 from pathlib import Path
@@ -17,6 +15,10 @@ import shutil
 import pandas as pd
 import openpyxl
 from openpyxl.styles import Font
+import matplotlib.pyplot as plt
+import japanize_matplotlib
+import matplotlib.dates as mdates
+
 
 THIS_FOLDER = Path(__file__).parent.resolve()
 
@@ -31,7 +33,9 @@ def signup_view(request):
     else:
         form = SignupForm()
     param = {
+        'title': 'ユーザー登録',
         'form': form,
+        'url': '/api/signup/'
         }
     return render(request, 'api/signup.html', param)
 
@@ -66,6 +70,48 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required
+def rename_view(request):
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect(to='/api/')
+        
+    else:
+        form = CustomUserChangeForm(instance=request.user)
+    
+    form.fields.pop('password')
+
+    param = {
+        'title': 'ユーザー名変更',
+        'form': form,
+        'url': '/api/rename/'
+    }
+    return render(request, 'api/signup.html', param)
+
+
+@login_required
+def setpassword_view(request):
+    if request.method == 'POST':
+        form = CustomSetPasswordForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+
+            return redirect(to='/api/')
+        
+    else:
+        form = CustomSetPasswordForm(user=request.user)
+    
+    param = {
+        'title': 'パスワード変更',
+        'form': form,
+        'url': '/api/setpassword/',
+    }
+    return render(request, 'api/signup.html', param)
 
 
 @login_required
@@ -224,14 +270,12 @@ def update(request):
 @login_required
 def box(request):
     id = request.POST.get('box')
-    print(id)
     report = Report.objects.get(id=id)
     user = request.user
     report.readers.add(user)
     readers = report.readers.all()
     report.readers_number = readers.count()
     report.save()
-    print(report.box_url)
     result = {
         'status': 'success',
         'url': report.box_url,
@@ -268,8 +312,6 @@ def output(request):
         os.makedirs(temp_dir, exist_ok=True)
         file_dir = temp_dir.joinpath('result.xlsx')
         df = pd.DataFrame(list(items.values()))
-        print(items.values())
-        print(df)
         df['datetime'] = df['datetime'].dt.tz_localize(None)+ pd.Timedelta(hours=9)
         df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時', '閲覧者数']
         df.to_excel(file_dir)
@@ -308,3 +350,45 @@ def output(request):
         wb.save(file_dir)
         filename, filepath = f'{keywords}.xlsx', file_dir
         return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filename)
+
+
+def analysis(request):
+    
+    items = Report.objects.all()
+
+    df = pd.DataFrame(list(items.values()))
+    df.index = df['datetime'].dt.tz_localize(None)+ pd.Timedelta(hours=9)
+
+    df = df.resample('T').count()
+
+    plt.plot(df.index, df['id'])
+    plt.xlabel('登録日時')
+    plt.ylabel('登録件数')
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    path_plot = THIS_FOLDER / 'static' / 'api' / 'img' / 'plot.png'
+    plt.savefig(path_plot)
+    plt.close()
+
+    sizes = []
+    labels = []
+
+    for i in range(1, Category.objects.count()+1):
+        sizes.append(Category(id=i).report_set.count())
+
+    for category in (Category.objects.all().order_by('name')):
+        labels.append(category.name)
+
+    colors = ['#ff9999', '#66b3ff', '#99ff99', '#ffcc99', '#c2c2f0', '#ffb3e6', '#ffb366']
+
+    fig1, ax1 = plt.subplots()
+    wedges, texts, autotexts = ax1.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+
+    path_plot = THIS_FOLDER / 'static' / 'api' / 'img' / 'pie.png'
+    plt.savefig(path_plot)
+    plt.close()  
+
+    params = {
+        'timestamp': timezone.now().timestamp(),
+    }
+    
+    return render(request, 'api/analysis.html', params)

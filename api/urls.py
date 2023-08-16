@@ -9,7 +9,10 @@ urlpatterns = [
     path('update/', views.update, name='update'),
     path('box/', views.box, name='box'),
     path('output/', views.output, name='output'),
+    path('analysis/', views.analysis, name='analysis'),
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('rename/', views.rename_view, name='rename'),
+    path('setpassword/', views.setpassword_view, name='setpassword'),
 ]

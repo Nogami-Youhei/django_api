@@ -13,6 +13,10 @@
         <h1>研究報告書データベース</h1>
         <nav>
             <ul class="main-nav">
+                <li><a href="{% url 'index' %}">DataBase</a></li>
+                <li><a href="{% url 'analysis' %}">Analysis</a></li>
+                <li><a href="{% url 'setpassword' %}">Password</a></li>
+                <li><a href="{% url 'rename' %}">Rename</a></li>
                 <li><a href="{% url 'logout' %}" id="logout">Logout</a></li>
             </ul>
         </nav>
@@ -23,29 +27,29 @@
     <div>
     <form action="{% url 'index' %}" method="post" id="report">
     {% csrf_token %}
-    <table>
+    <table class="animation2">
     <tr><th colspan="2">登録</th></tr>
     {{ report_form }}
     </table>
-    <input type="button" value="登録" id="report-btn">
+    <input type="button" value="登録" id="report-btn" class="animation2">
     </form>
     <div id="status"></div>
     </div>
 
     <div>
     <form action="{% url 'search' %}" method="post" id="search">
-    <table>
+    <table class="animation2">
     <tr><th colspan="2">検索</th></tr>
     {% csrf_token %}
     {{ search_form }}
     <tr>
     </table>
     <input type="hidden" value="1">
-    <input type="button" value="検索" id="search-btn">
+    <input type="button" value="検索" id="search-btn" class="animation2">
     </form>
     <form action="{% url 'output' %}" method="post" id="output">
     {% csrf_token %}
-    <input type="button" value="出力" id="output-btn">
+    <input type="button" value="出力" id="output-btn" class="animation2">
     </form>
     </div>
 

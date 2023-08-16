@@ -13,6 +13,11 @@ a {
   text-decoration: none;
 }
 
+.center {
+  text-align: center;
+  font-size: 1.25rem;
+}
+
 .main-nav {
   display: flex;
   font-size: 1.25rem;
@@ -44,6 +49,13 @@ a {
 }
 
 .wrapper2 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+}
+
+.wrapper3 {
   display: flex;
   justify-content: center;
 }
@@ -94,7 +106,9 @@ a {
   color: #aaa;
 }
 
-[type='text'], textarea, [type='url'], #id_password1, #id_password2 {
+/* テキストボックス */
+[type='text'], textarea, [type='url'],
+#id_password1, #id_password2, #id_new_password1, #id_new_password2 {
   outline: none;
   display: block;
   width: 11rem;
@@ -108,15 +122,26 @@ a {
   transition: 0.3s;
  }
 
+ #popup-content [type='text'], #popup-content textarea,
+ #popup-content [type='url'] {
+  width: 18rem;
+  height: 40px;
+ }
+
  [type='text']:focus, textarea:focus, [type='url']:focus,
- #id_password1:focus, #id_password2:focus {
+ #id_password1:focus, #id_password2:focus,
+ #id_new_password1:focus, #id_new_password2:focus {
   border: 1px solid #0bd;
   background-color: rgb(239, 245, 250);
   box-shadow: 0 0 10px rgba(0, 187, 221);
  }
 
  textarea {
-  height: 150px;
+  height: 10rem;
+ }
+
+ #popup-content textarea {
+  height: 16rem;
  }
 
 /* テーブル */
@@ -164,7 +189,8 @@ tr:not(:first-child):hover {
 }
 
 .signup {
-  margin: 2rem auto;
+  margin: auto;
+  margin-top: 4rem;
 }
 
 /* ボタン */
@@ -246,7 +272,7 @@ tr:not(:first-child):hover {
 #popup-content {
 	display: inline-block;
 	position: fixed;
-	width: 60%;
+	width: 70%;
   height: 70%;
 	z-index: 2;
 	background: #fff;
@@ -256,25 +282,16 @@ tr:not(:first-child):hover {
   text-align: center;
   overflow: hidden;
   border-radius: 20px;
-}
-
-.wrapper2 {
-  position: relative;
+  overflow: auto;
 }
 
 #detail-table {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+  margin: auto;
   width: 90%;
 }
 
 #update-table {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+  margin: auto;
   width: 100%;
 }
 
@@ -283,11 +300,11 @@ tr:not(:first-child):hover {
   width: 80%;
 }
 
-.popup-table th:first-child {
+#detail-table .popup-table th:first-child {
   width: 20%;
 }
 
-.update-table td {
+.detail-table td {
   text-align: left;
 }
 
@@ -381,4 +398,37 @@ tr:not(:first-child):hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+/* アニメーション */
+.animation {
+  animation: zoomIn 0.8s cubic-bezier(0.25, 1, 0.5, 1) 1 forwards;
+}
+ 
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+ 
+.animation2 {
+  animation: slideIn 1s cubic-bezier(0.25, 1, 0.5, 1) 1 forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-50px);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(0);
+  }
+  60%,100% {
+    opacity: 1;
+  }
 }

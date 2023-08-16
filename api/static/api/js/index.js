@@ -25,15 +25,18 @@ for (let i = 0; i < 6; i++) {
 async function Register() {
     document.getElementById('status').textContent = '登録中...';
 	const form = document.getElementById('report');
-	
+	const formData = new FormData(form)
+
 	const endPoint = form.action;
     const response = await fetch(endPoint, {
         method: 'POST',
-        body: new FormData(form)
+        body: formData
     });
 	const res = await response.text();
     if (res === 'success') {
         document.getElementById('status').textContent = '登録完了しました';
+        const title = formData.get('title')
+        alert(`${title}を登録完了しました`)
         Array.from(document.getElementsByClassName('errorlist')).forEach((v) => {
             v.innerHTML = '';
         })
@@ -81,7 +84,6 @@ async function Search(event, loading) {
                 target.classList.add('hidden')
                 document.getElementById('detail-result').innerHTML = '';
             });
-            console.log(this)
             const form = this.parentElement;
             const endPoint = form.action;
             const response = await fetch(endPoint, {
@@ -145,17 +147,20 @@ async function Search(event, loading) {
             document.getElementById('status2').textContent = '更新中...'
             const form = document.getElementById('update2');
             const endPoint = form.action;
+            const formData = new FormData(form)
+            const title = formData.get('title')
+
             const response = await fetch(endPoint, {
                 method: 'POST',
-                body: new FormData(form)
+                body: formData
             });
             const res = await response.text();
         
             if (res === 'success') {
                 Search(event, false)
-                document.getElementById('status2').textContent = '更新完了'
+                document.getElementById('status2').textContent = `${title}の更新が完了しました`
             } else {
-                document.getElementById('status2').innerHTML = '失敗';
+                document.getElementById('status2').innerHTML = '入力内容を確認してください';
             }
             });
 
