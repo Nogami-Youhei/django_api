@@ -352,6 +352,7 @@ def output(request):
         return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filename)
 
 
+@login_required
 def analysis(request):
     
     items = Report.objects.all()

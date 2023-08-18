@@ -66,9 +66,11 @@ async function Search(event, loading) {
         body: formData
     });
 	const res = await response.text();
-
+    
     if (res.trim()[0] === '<') {
+        document.getElementById('result').classList.add('animation1')
         document.getElementById('result').innerHTML = res;
+
         const btn_search = document.getElementsByClassName('search');
         Array.from(btn_search).forEach((v) => v.addEventListener('click', function(event) { Search(event, false) }));
 
@@ -239,6 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 window.onpageshow = function(event) {
     if (event.persisted) {
-        window.location.href = document.referrer;
+        location.reload()
     }
 };
