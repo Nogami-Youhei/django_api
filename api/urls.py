@@ -17,10 +17,13 @@ urlpatterns = [
     path('rename/', views.rename_view, name='rename'),
     path('setpassword/', views.setpassword_view, name='setpassword'),
     path('token/', views.token_view, name='token'),
-    path('reports/', views.ReportList.as_view()),
-    path('reports/<int:pk>/', views.ReportDetail.as_view()),
-    path('authors/', views.AuthorList.as_view()),
-    path('authors/<int:pk>/', views.AuthorDetail.as_view()),
+    path('root/reports/', views.ReportList.as_view(), name='report-list'),
+    path('root/reports/<int:pk>/', views.ReportDetail.as_view(), name='report-detail'),
+    path('root/authors/', views.AuthorList.as_view(), name='author-list'),
+    path('root/authors/<int:pk>/', views.AuthorDetail.as_view(), name='author-detail'),
+    path('root/categories/', views.CategoryList.as_view(), name='category-list'),
+    path('root/categories/<int:pk>/', views.CategoryDetail.as_view(), name='category-detail'),
+    path('root/', views.api_root, name='api-root'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

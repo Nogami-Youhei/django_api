@@ -399,7 +399,7 @@ def analysis(request):
 
 
 from api.models import Report
-from api.serializers import ReportSerializer, AuthorSerializer
+from api.serializers import ReportSerializer, AuthorSerializer, CategorySerializer
 from rest_framework import generics
 from rest_framework import permissions
 from api.permissions import IsAuthorOrReadOnly
@@ -443,9 +443,36 @@ class AuthorDetail(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class CategoryList(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class CategoryDetail(generics.RetrieveAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+
 from rest_framework.authtoken.models import Token
 
 @login_required
 def token_view(request):
     token, created = Token.objects.get_or_create(user=request.user)
     return HttpResponse(token)
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'authors': reverse('author-list', request=request, format=format),
+        'reports': reverse('report-list', request=request, format=format)
+    })
