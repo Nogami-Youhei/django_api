@@ -59,7 +59,7 @@ async function Search(event, loading) {
 	const form = document.getElementById('search');
 	let formData = new FormData(form);
     formData.append('p', event.target.previousElementSibling.value);
-	
+
 	const endPoint = form.action;
     const response = await fetch(endPoint, {
         method: 'POST',

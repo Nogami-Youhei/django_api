@@ -16,8 +16,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('rename/', views.rename_view, name='rename'),
     path('setpassword/', views.setpassword_view, name='setpassword'),
-    path('report/', views.report_list),
-    path('report/<int:pk>/', views.report_detail),
+    path('token/', views.token_view, name='token'),
+    path('reports/', views.ReportList.as_view()),
+    path('reports/<int:pk>/', views.ReportDetail.as_view()),
+    path('authors/', views.AuthorList.as_view()),
+    path('authors/<int:pk>/', views.AuthorDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

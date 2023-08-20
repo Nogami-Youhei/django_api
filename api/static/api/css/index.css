@@ -197,6 +197,12 @@ tr:not(:first-child):hover {
   text-align: left;
 }
 
+#token-table, #token-table th, #token-table td {
+  background-color: #fff;
+  color: #432;
+  border-width: 0px;
+}
+
 /* ボタン */
 [type='button'], [type='submit'], #url, .page {
   font-size: 1rem;

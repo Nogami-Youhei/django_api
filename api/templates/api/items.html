@@ -30,7 +30,7 @@
     </form>
     </td>
     <td>
-    {% if smile_id == item.smile_id %}
+    {% if author == item.author %}
     <form action="{% url 'update' %}" method="post" id="update">
     {% csrf_token %}
     <input type="hidden" value="{{ item.id }}" name="update">
@@ -38,7 +38,7 @@
     </form>
     {% endif %}
     </td><td>
-    {% if smile_id == item.smile_id %}
+    {% if author == item.author %}
     <form action="{% url 'delete' %}" method="post" id="delete">
     {% csrf_token %}
     <input type="hidden" value="{{ item.id }}" name="delete">

@@ -8,6 +8,7 @@ import pytz
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth import login, logout
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 import os
 from pathlib import Path
@@ -129,6 +130,7 @@ def index(request):
             first_name = request.user.first_name
             report.name = last_name + ' ' + first_name
             report.smile_id = smile_id
+            report.author = request.user
             report.save()
             
             return HttpResponse('success')
@@ -208,10 +210,10 @@ def search(request):
         number = request.POST.get('p', 1)
         items = paginator.page(number)
 
-        smile_id = request.user.username
+        author = request.user
         params = {
             'items': items,
-            'smile_id': smile_id,
+            'author': author,
         }
 
         return render(request, 'api/items.html', params)
@@ -396,52 +398,54 @@ def analysis(request):
 
 
 
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from api.models import Report
-from api.serializers import SnippetSerializer
+from api.serializers import ReportSerializer, AuthorSerializer
+from rest_framework import generics
+from rest_framework import permissions
+from api.permissions import IsAuthorOrReadOnly
 
+User = get_user_model()
 
-@api_view(['GET', 'POST'])
-def report_list(request, format=None):
-    """
-    List all code snippets, or create a new snippet.
-    """
-    if request.method == 'GET':
-        snippets = Report.objects.all()
-        serializer = SnippetSerializer(snippets, many=True)
-        return Response(serializer.data)
+class ReportList(generics.ListCreateAPIView):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
 
-    elif request.method == 'POST':
-        serializer = SnippetSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        user = self.request.user
+
+        serializer.save(
+            name=user.last_name + ' ' + user.first_name,
+            smile_id=user.username,
+            author=user,
+        )
     
+    permission_classes = [permissions.IsAuthenticated]
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def report_detail(request, pk, format=None):
-    """
-    Retrieve, update or delete a code snippet.
-    """
-    try:
-        snippet = Report.objects.get(pk=pk)
-    except Report.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = SnippetSerializer(snippet)
-        return Response(serializer.data)
+class ReportDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
 
-    elif request.method == 'PUT':
-        serializer = SnippetSerializer(snippet, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
 
-    elif request.method == 'DELETE':
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class AuthorList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = AuthorSerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class AuthorDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = AuthorSerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+
+from rest_framework.authtoken.models import Token
+
+@login_required
+def token_view(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    return HttpResponse(token)
