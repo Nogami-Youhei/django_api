@@ -1,6 +1,11 @@
-from django.urls import path
-from rest_framework.urlpatterns import format_suffix_patterns
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
+
+router = DefaultRouter()
+router.register(r'reports', views.ReportViewSet, basename='report')
+router.register(r'authors', views.AuthorViewSet, basename='author')
+router.register(r'categories', views.CategoryViewSet, basename='category')
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -17,13 +22,5 @@ urlpatterns = [
     path('rename/', views.rename_view, name='rename'),
     path('setpassword/', views.setpassword_view, name='setpassword'),
     path('token/', views.token_view, name='token'),
-    path('root/reports/', views.ReportList.as_view(), name='report-list'),
-    path('root/reports/<int:pk>/', views.ReportDetail.as_view(), name='report-detail'),
-    path('root/authors/', views.AuthorList.as_view(), name='author-list'),
-    path('root/authors/<int:pk>/', views.AuthorDetail.as_view(), name='author-detail'),
-    path('root/categories/', views.CategoryList.as_view(), name='category-list'),
-    path('root/categories/<int:pk>/', views.CategoryDetail.as_view(), name='category-detail'),
-    path('root/', views.api_root, name='api-root'),
+    path('root/', include(router.urls)),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)

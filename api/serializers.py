@@ -24,7 +24,7 @@ class AuthorSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'written_reports', 'viewed_reports']
+        fields = ['id', 'username', 'last_name', 'first_name', 'written_reports', 'viewed_reports']
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):

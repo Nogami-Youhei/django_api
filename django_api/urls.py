@@ -24,6 +24,6 @@ urlpatterns = [
 
 
 # API Basic認証 ログインボタンの追加
-# urlpatterns += [
-#     path('api-auth/', include('rest_framework.urls')),
-# ]
+urlpatterns += [
+    path('api-auth/', include('rest_framework.urls')),
+]

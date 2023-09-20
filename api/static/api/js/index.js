@@ -52,13 +52,30 @@ async function Register() {
 }
 
 
-async function Search(event, loading) {
+async function Search(event, loading, deleteState=false) {
     if (loading === true) {
         replaceOrAddChild(document.getElementById('result'), div1);
     }
 	const form = document.getElementById('search');
 	let formData = new FormData(form);
-    formData.append('p', event.target.previousElementSibling.value);
+
+    let pageNum = event.target.previousElementSibling.value
+    formData.append('p', pageNum);
+
+    if (deleteState) {
+
+        let pageNum2 = document.getElementsByClassName('page')[0].textContent.trim()[0]
+
+        if (document.getElementById('result').querySelectorAll('tr').length === 2) {
+            if (pageNum2 - 1) {
+                formData.append('p', pageNum2 - 1);
+            } else {
+                formData.append('p', pageNum2);
+            }
+        } else {
+            formData.append('p', pageNum2);
+        }
+    }
 
 	const endPoint = form.action;
     const response = await fetch(endPoint, {
@@ -113,7 +130,7 @@ async function Search(event, loading) {
             const res = await response.text();
         
             if (res === 'delete') {
-                Search(event, false)
+                Search(event, false, deleteState=true)
             } else {
                 document.getElementById('status').innerHTML = '失敗';
             }

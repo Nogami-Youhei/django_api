@@ -208,6 +208,7 @@ def search(request):
             
         paginator = Paginator(items, 8)
         number = request.POST.get('p', 1)
+        print(number)
         items = paginator.page(number)
 
         author = request.user
@@ -315,12 +316,12 @@ def output(request):
         file_dir = temp_dir.joinpath('result.xlsx')
         df = pd.DataFrame(list(items.values()))
         df['datetime'] = df['datetime'].dt.tz_localize(None)+ pd.Timedelta(hours=9)
-        df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時', '閲覧者数']
+        df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時', '閲覧者数', '登録者ID']
         df.to_excel(file_dir)
 
         wb = openpyxl.load_workbook(file_dir)
         ws = wb.active
-        ws.auto_filter.ref = "A1:H1"
+        ws.auto_filter.ref = "A1:J1"
         ws.column_dimensions['C'].width = 15
         ws.column_dimensions['D'].width = 15
         ws.column_dimensions['E'].width = 20
@@ -376,7 +377,7 @@ def analysis(request):
     labels = []
 
     for i in range(1, Category.objects.count()+1):
-        sizes.append(Category(id=i).report_set.count())
+        sizes.append(Category(id=i).reports.count())
 
     for category in (Category.objects.all().order_by('name')):
         labels.append(category.name)
@@ -403,12 +404,14 @@ from api.serializers import ReportSerializer, AuthorSerializer, CategorySerializ
 from rest_framework import generics
 from rest_framework import permissions
 from api.permissions import IsAuthorOrReadOnly
+from rest_framework import viewsets
 
 User = get_user_model()
 
-class ReportList(generics.ListCreateAPIView):
+class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -418,39 +421,16 @@ class ReportList(generics.ListCreateAPIView):
             smile_id=user.username,
             author=user,
         )
-    
-    permission_classes = [permissions.IsAuthenticated]
 
 
-class ReportDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Report.objects.all()
-    serializer_class = ReportSerializer
-
-    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
-
-
-class AuthorList(generics.ListAPIView):
+class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = AuthorSerializer
 
     permission_classes = [permissions.IsAuthenticated]
 
 
-class AuthorDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = AuthorSerializer
-
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class CategoryList(generics.ListAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class CategoryDetail(generics.RetrieveAPIView):
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -474,5 +454,6 @@ from rest_framework.reverse import reverse
 def api_root(request, format=None):
     return Response({
         'authors': reverse('author-list', request=request, format=format),
-        'reports': reverse('report-list', request=request, format=format)
+        'reports': reverse('report-list', request=request, format=format),
+        'categories': reverse('category-list', request=request, format=format),
     })
