@@ -6,6 +6,16 @@ function replaceOrAddChild(parentElement, newChildElement) {
     }
 }
 
+function testCheckbox(del=false) {
+    const checkboxes = document.getElementsByClassName('checkbox');
+    const checkedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+    if (del) {
+        return checkedCheckboxes
+    } else {
+        return checkedCheckboxes[0].value
+    }
+}
+
 let div1 = document.createElement('div')
 div1.className = 'div1'
 let div2 = document.createElement('div')
@@ -36,7 +46,7 @@ async function Register() {
     if (res === 'success') {
         document.getElementById('status').textContent = '登録完了しました';
         const title = formData.get('title')
-        alert(`${title}を登録完了しました`)
+        // alert(`${title}を登録完了しました`)
         Array.from(document.getElementsByClassName('errorlist')).forEach((v) => {
             v.innerHTML = '';
         })
@@ -50,7 +60,6 @@ async function Register() {
         output_btn.addEventListener('click', Output);
     }
 }
-
 
 async function Search(event, loading, deleteState=false) {
     if (loading === true) {
@@ -88,11 +97,89 @@ async function Search(event, loading, deleteState=false) {
         document.getElementById('result').classList.add('animation1')
         document.getElementById('result').innerHTML = res;
 
+        // 次へボタンへの設定
         const btn_search = document.getElementsByClassName('search');
         Array.from(btn_search).forEach((v) => v.addEventListener('click', function(event) { Search(event, false) }));
 
-        const detail_btn = Array.from(document.getElementsByClassName('detail_btn'));
-        detail_btn.forEach((v) => v.addEventListener('click', async function Detail() {
+        const checkboxSelector = document.getElementById('checkbox-selector')
+        checkboxSelector.addEventListener('click', function checkboxChecker() {
+            const checkboxes = document.getElementsByClassName('checkbox');
+            console.log('aaa')
+            console.log(checkboxSelector)
+            if (checkboxSelector.checked) {
+                for (let x of Array.from(checkboxes)) {
+                    x.checked = true
+                }   
+            } else {
+                for (let x of Array.from(checkboxes)) {
+                    x.checked = false
+                } 
+            }
+        });
+
+        function btnControl(e) {
+            // checkbox以外の部分をクリックしたときにチェックが入るように設定
+            if (e.target.tagName !== 'INPUT') {
+                e.target.parentElement.firstElementChild.firstElementChild.checked = !e.target.parentElement.firstElementChild.firstElementChild.checked
+            }
+            const checkboxes = document.getElementsByClassName('checkbox');
+            console.log(checkboxes[0].checked)
+            const checkedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+            console.log(checkedCheckboxes);
+
+            if (checkedCheckboxes.length === 1) {
+                const boxBtn = document.getElementById('box-btn')
+                boxBtn.classList.remove('hover');
+                boxBtn.disabled = false;
+                const detailBtn = document.getElementById('detail-btn')
+                detailBtn.classList.remove('hover');
+                detailBtn.disabled = false;
+                const updateBtn = document.getElementById('update-btn')
+                updateBtn.classList.remove('hover');
+                updateBtn.disabled = false;
+                const deleteBtn = document.getElementById('delete-btn')
+                deleteBtn.classList.remove('hover');
+                deleteBtn.disabled = false;
+            } else if (checkedCheckboxes.length === 0) {
+                const boxBtn = document.getElementById('box-btn')
+                boxBtn.classList.add('hover');
+                boxBtn.disabled = true;
+                const detailBtn = document.getElementById('detail-btn')
+                detailBtn.classList.add('hover');
+                detailBtn.disabled = true;
+                const updateBtn = document.getElementById('update-btn')
+                updateBtn.classList.add('hover');
+                updateBtn.disabled = true;
+                const deleteBtn = document.getElementById('delete-btn')
+                deleteBtn.classList.add('hover');
+                deleteBtn.disabled = true;
+            } else {
+                const boxBtn = document.getElementById('box-btn')
+                boxBtn.classList.add('hover');
+                boxBtn.disabled = true;
+                const detailBtn = document.getElementById('detail-btn')
+                detailBtn.classList.add('hover');
+                detailBtn.disabled = true;
+                const updateBtn = document.getElementById('update-btn')
+                updateBtn.classList.add('hover');
+                updateBtn.disabled = true;
+                const deleteBtn = document.getElementById('delete-btn')
+                deleteBtn.classList.remove('hover');
+                deleteBtn.disabled = false;
+            }
+        }
+
+        // checkboxがチェックされているかどうか確認
+        const checkboxesTr = document.getElementsByClassName('checkbox-tr');
+        Array.from(checkboxesTr).forEach((v) => v.addEventListener('click', function(e) { btnControl(e) }));
+        checkboxSelector.addEventListener('click', function(e) { btnControl(e) });
+        
+        
+        const detailBtn = document.getElementById('detail-btn');
+        detailBtn.addEventListener('click', async function Detail(e) {
+
+            const id = testCheckbox()
+
             replaceOrAddChild(document.getElementById('detail-result'), div1);
 
             let target = document.getElementById("popup-window");
@@ -103,11 +190,14 @@ async function Search(event, loading, deleteState=false) {
                 target.classList.add('hidden')
                 document.getElementById('detail-result').innerHTML = '';
             });
-            const form = this.parentElement;
+
+            const form = e.target.parentElement;
             const endPoint = form.action;
+            let formData = new FormData(form)
+            formData.append('detail', id);
             const response = await fetch(endPoint, {
                 method: 'POST',
-                body: new FormData(form)
+                body: formData
             });
             const res = await response.text();
         
@@ -116,16 +206,19 @@ async function Search(event, loading, deleteState=false) {
             } else {
                 document.getElementById('detail-result').innerHTML = '失敗';
             }
-        }));
+        });
 
-        const delete_btn = Array.from(document.getElementsByClassName('delete_btn'));
-        delete_btn.forEach((v) => v.addEventListener('click', async function Delete() {
-
-            const form = this.parentElement;
+        const deleteBtn = document.getElementById('delete-btn');
+        deleteBtn.addEventListener('click', async function Delete(e) {
+            const checkedCheckboxes = testCheckbox(del=true)
+            const checkedList = checkedCheckboxes.map(x => x.value);
+            const form = e.target.parentElement;
             const endPoint = form.action;
+            let formData = new FormData(form);
+            formData.append('checked_list', checkedList)
             const response = await fetch(endPoint, {
                 method: 'POST',
-                body: new FormData(form)
+                body: formData
             });
             const res = await response.text();
         
@@ -134,12 +227,12 @@ async function Search(event, loading, deleteState=false) {
             } else {
                 document.getElementById('status').innerHTML = '失敗';
             }
-        }));
+        });
 
-        const update_btn = Array.from(document.getElementsByClassName('update_btn'));
-        update_btn.forEach((v) => v.addEventListener('click', async function Update() {
+        const updateBtn = document.getElementById('update-btn');
+        updateBtn.addEventListener('click', async function Update() {
+            const id = testCheckbox()
 
-            const id = this.previousElementSibling.value;
             const endPoint = `/api/update/?id=${id}`;
             const response = await fetch(endPoint, {
                 method: 'GET',
@@ -186,10 +279,10 @@ async function Search(event, loading, deleteState=false) {
             } else {
                 document.getElementById('status').innerHTML = '失敗';
             }
-        }));
+        });
 
-        const box_btn = Array.from(document.getElementsByClassName('box_btn'));
-        box_btn.forEach((v) => v.addEventListener('click', Box));
+        const boxBtn = document.getElementById('box-btn');
+        boxBtn.addEventListener('click', Box);
 
     } else {
         document.getElementById('result').innerHTML = '失敗';
@@ -231,20 +324,25 @@ async function Output() {
     }
 
 async function Box(e) {
+    const id = testCheckbox()
+
     const boxForm = e.target.parentElement;
-	const endPoint = boxForm.action;
+    const endPoint = boxForm.action;
+    let formData = new FormData(boxForm);
+
+    formData.append('box', id);
     const response = await fetch(endPoint, {
         method: 'POST',
-        body: new FormData(boxForm)
+        body: formData
     });
-        const res = await response.json();
+    const res = await response.json();
 
-        if (res.status === 'success') {
-            window.open(res.url);
-        } else {
-            console.log('error');
-        }
+    if (res.status === 'success') {
+        window.open(res.url);
+    } else {
+        console.log('error');
     }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
 	const report_btn = document.getElementById('report-btn');
