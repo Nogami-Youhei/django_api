@@ -21,3 +21,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/', include('api.urls'))
 ]
+
+
+# API Basic認証 ログインボタンの追加
+urlpatterns += [
+    path('api-auth/', include('rest_framework.urls')),
+]

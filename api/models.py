@@ -20,8 +20,9 @@ class Report(models.Model):
     abstract = models.CharField(max_length=255)
     box_url = models.URLField(max_length=255)
     datetime = models.DateTimeField(auto_now_add=True)
-    categories = models.ManyToManyField(Category, blank=True)
-    readers = models.ManyToManyField(CustomUser)
+    categories = models.ManyToManyField(Category, related_name='reports', blank=True)
+    author = models.ForeignKey(CustomUser, related_name='written_reports', on_delete=models.CASCADE, null=True)
+    readers = models.ManyToManyField(CustomUser, related_name='viewed_reports')
     readers_number = models.IntegerField(default=0)
     
     class Meta:

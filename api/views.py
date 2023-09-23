@@ -8,6 +8,7 @@ import pytz
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth import login, logout
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 import os
 from pathlib import Path
@@ -129,6 +130,7 @@ def index(request):
             first_name = request.user.first_name
             report.name = last_name + ' ' + first_name
             report.smile_id = smile_id
+            report.author = request.user
             report.save()
             
             return HttpResponse('success')
@@ -208,10 +210,10 @@ def search(request):
         number = request.POST.get('p', 1)
         items = paginator.page(number)
 
-        smile_id = request.user.username
+        author = request.user
         params = {
             'items': items,
-            'smile_id': smile_id,
+            'author': author,
         }
 
         return render(request, 'api/items.html', params)
@@ -241,8 +243,11 @@ def detail(request):
 
 @login_required
 def delete(request):
-    id = request.POST.get('delete')
-    report = Report.objects.get(id=id)
+    checked_list = request.POST.get('checked_list')
+    print(type(checked_list))
+    checked_list = [int(i) for i in checked_list.split(',')]
+    print(checked_list)
+    report = Report.objects.filter(id__in=checked_list)
     report.delete()
     return HttpResponse('delete')
 
@@ -313,12 +318,12 @@ def output(request):
         file_dir = temp_dir.joinpath('result.xlsx')
         df = pd.DataFrame(list(items.values()))
         df['datetime'] = df['datetime'].dt.tz_localize(None)+ pd.Timedelta(hours=9)
-        df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時', '閲覧者数']
+        df.columns = ['ID', '氏名', 'Smile_ID', 'タイトル', '要約', 'BOX_URL', '登録日時', '閲覧者数', '登録者ID']
         df.to_excel(file_dir)
 
         wb = openpyxl.load_workbook(file_dir)
         ws = wb.active
-        ws.auto_filter.ref = "A1:H1"
+        ws.auto_filter.ref = "A1:J1"
         ws.column_dimensions['C'].width = 15
         ws.column_dimensions['D'].width = 15
         ws.column_dimensions['E'].width = 20
@@ -374,7 +379,7 @@ def analysis(request):
     labels = []
 
     for i in range(1, Category.objects.count()+1):
-        sizes.append(Category(id=i).report_set.count())
+        sizes.append(Category(id=i).reports.count())
 
     for category in (Category.objects.all().order_by('name')):
         labels.append(category.name)
@@ -393,3 +398,64 @@ def analysis(request):
     }
     
     return render(request, 'api/analysis.html', params)
+
+
+
+from api.models import Report
+from api.serializers import ReportSerializer, AuthorSerializer, CategorySerializer
+from rest_framework import generics
+from rest_framework import permissions
+from api.permissions import IsAuthorOrReadOnly
+from rest_framework import viewsets
+
+User = get_user_model()
+
+class ReportViewSet(viewsets.ModelViewSet):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+
+        serializer.save(
+            name=user.last_name + ' ' + user.first_name,
+            smile_id=user.username,
+            author=user,
+        )
+
+
+class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = AuthorSerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    permission_classes = [permissions.IsAuthenticated]
+
+
+from rest_framework.authtoken.models import Token
+
+@login_required
+def token_view(request):
+    token, created = Token.objects.get_or_create(user=request.user)
+    return HttpResponse(token)
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'authors': reverse('author-list', request=request, format=format),
+        'reports': reverse('report-list', request=request, format=format),
+        'categories': reverse('category-list', request=request, format=format),
+    })

@@ -61,12 +61,21 @@ a {
 }
 
 .page-wrapper {
-  display: flex;
   justify-content: center;
   position: absolute;
   left: 50%;
   transform: translate(-50%);
-  bottom: -4rem;
+  bottom: -3rem;
+}
+
+.wrapper4 {
+  display: flex;
+  justify-content: center;
+}
+
+.wrapper5 {
+  display: flex;
+  justify-content: center;
 }
 
 #result {
@@ -197,8 +206,14 @@ tr:not(:first-child):hover {
   text-align: left;
 }
 
+#token-table, #token-table th, #token-table td {
+  background-color: #fff;
+  color: #432;
+  border-width: 0px;
+}
+
 /* ボタン */
-[type='button'], [type='submit'], #url, .page {
+[type='button'], [type='submit'], .page {
   font-size: 1rem;
   background-color: #fff;
   margin: 1.5rem auto;
@@ -232,17 +247,27 @@ tr:not(:first-child):hover {
   margin: 0;
 }
 
-[type='button']:hover, [type='submit']:hover, #url:hover, .hover {
+[type='button']:hover, [type='submit']:hover, .hover {
 	background: #ccc;
   box-shadow: None;
 }
 
-#result [type='button'], #url {
+#result [type='button'] {
   width: 4rem;
   height: 2.5rem;
-  margin: 0 auto;
+  margin: 0;
   line-height: 2.5rem;
   box-sizing: border-box;
+}
+
+#result .wrapper4 [type='button'] {
+  width: 5.5rem;
+  height: 2.8rem;
+  margin: 0 0.5rem;
+  margin-bottom: 2.5rem;
+  line-height: 2.5rem;
+  box-sizing: border-box;
+  border-radius: 10px;
 }
 
 .left {
@@ -253,7 +278,7 @@ tr:not(:first-child):hover {
   border-right-width: 1px;
 }
 
-.delete_btn {
+#delete-btn {
   color: red;
   border: 1px solid red;
 }
