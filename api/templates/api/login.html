@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'api/css/login.css' %}">
+    <link rel="icon" href="/static/api/img/favicon.png" type="image/png">
+    <title>login</title>
+</head>
+    <script src="https://code.jquery.com/jquery-2.1.0.min.js" ></script>
+    <body>
+    <div id="formWrapper">
+    
+    <div id="form">
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow&display=swap');
+        </style>
+        <text x="100" y="30" text-anchor="middle" font-size="50" font-family="Pacifico" font-weight="normal">SEKISUI</text>
+      </svg>
+    </div>
+        <form action="{% url 'login' %}" method="post">
+        <div class="form-item">
+          <p class="formLabel">UserID</p>
+          {% csrf_token %}
+          {{ form.username }}
+        </div>
+        <div class="form-item">
+          <p class="formLabel">Password</p>
+          {{ form.password }}
+        <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        <div class="form-item">
+        <p class="pull-left"><a href="{% url 'signup' %}"><small>Register</small></a></p>
+        <input type="submit" class="login pull-right" value="Log In">
+        <div class="clear-fix"></div>
+        </div>
+        <div class="errors">{{ form.non_field_errors }}</div>
+        </form>
+    </div>
+    </div>
+    <script src="{% static 'api/js/login.js' %}"></script>
+    </body>
+</html>

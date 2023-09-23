@@ -1,0 +1,15 @@
+<div id="update-table">
+<form action="{% url 'update' %}" method="post" id="update2">
+<table class="popup-table update-table">
+{% csrf_token %}
+<tr><th colspan="4">更新</th></tr>
+<tr><th>題目:</th><td>{{ report_form.title }}</td>
+<th>Box url:</th><td>{{ report_form.box_url }}</td></tr>
+<tr><th>要約:</th><td>{{ report_form.abstract }}</td>
+<th>分野:</th><td id="category">{{ report_form.categories }}</td></tr>
+<input type="hidden" value="{{ id }}" name="id">
+<tr><th></th><td><input type="button" value="更新" id="update_btn2"></td>
+<td colspan="2"><p id="status2"></p></td></tr>
+</table>
+</form>
+</div>

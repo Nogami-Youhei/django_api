@@ -1,0 +1,11 @@
+<div id="detail-table">
+<h2>詳細情報</h2>
+<table class="popup-table">
+    <tr><th>項目</th><th>内容</th></tr>
+    <tr><th>氏名：</th><td>{{ report.name }}</td></tr>
+    <tr><th>要約：</th><td>{{ report.abstract }}</td></tr>
+    <tr><th>カテゴリ：</th><td>{{ categories|join:', '}}</td></tr>
+    <tr><th>閲覧者：</th><td>{{ users | join:', '}}</td></tr>
+    <tr><th>閲覧数：</th><td>{{ readers_number}}</td></tr>
+</table>
+</div>

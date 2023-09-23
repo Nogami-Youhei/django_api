@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'api/css/index.css' %}">
+    <link rel="icon" href="/static/api/img/favicon.png" type="image/png">
+    <title>研究報告書データベース</title>
+</head>
+<body>
+    <header class="page-header wrapper">
+        <h1>研究報告書データベース</h1>
+        <nav>
+            <ul class="main-nav">
+                <li><a href="{% url 'index' %}">DataBase</a></li>
+                <li><a href="{% url 'analysis' %}">Analysis</a></li>
+                <li><a href="{% url 'setpassword' %}">Password</a></li>
+                <li><a href="{% url 'rename' %}">Rename</a></li>
+                <li><a href="{% url 'logout' %}" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="wrapper">
+        <p>ようこそ{{ user }}さん</p>
+    <div class="wrapper2">
+    <div>
+    <form action="{% url 'index' %}" method="post" id="report">
+    {% csrf_token %}
+    <table class="animation2">
+    <tr><th colspan="2">登録</th></tr>
+    {{ report_form }}
+    </table>
+    <input type="button" value="登録" id="report-btn" class="animation2">
+    </form>
+    <div id="status"></div>
+    </div>
+
+    <div>
+    <form action="{% url 'search' %}" method="post" id="search">
+    <table class="animation2">
+    <tr><th colspan="2">検索</th></tr>
+    {% csrf_token %}
+    {{ search_form }}
+    <tr>
+    </table>
+    <input type="hidden" value="1">
+    <input type="button" value="検索" id="search-btn" class="animation2">
+    </form>
+    <form action="{% url 'output' %}" method="post" id="output">
+    {% csrf_token %}
+    <input type="button" value="出力" id="output-btn" class="animation2">
+    </form>
+    </div>
+
+    <div id="result"><p id="placeholder">検索結果はこちらに表示されます</p></div>
+    </div>
+    <div id="popup-window" class="hidden">
+        <div id="popup-background"></div>
+        <div id="popup-content">
+        <div id="close">×</div>
+        <div id="detail-result"></div>
+    </div>
+    </div>
+    </div>
+    <script src="{% static 'api/js/index.js' %}"></script>
+</body>
+</html>
