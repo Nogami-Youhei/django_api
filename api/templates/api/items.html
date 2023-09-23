@@ -9,7 +9,11 @@
     {% for item in items %}
     <tr class="checkbox-tr" data-id="{{ item.id }}">
     <td>
-    <input type="checkbox" value="{{ item.id }}" class="checkbox" id="{{ item.id }}">
+    {% if author == item.author %}
+    <input type="checkbox" value="{{ item.id }}" class="checkbox" id="{{ item.id }}" data-author="1">
+    {% else %}
+    <input type="checkbox" value="{{ item.id }}" class="checkbox" id="{{ item.id }}" data-author="0">
+    {% endif %}
     </td>
     <td>{{ item.id }}</td>
     <td>{{ item.name }}</td>
@@ -22,6 +26,7 @@
 </table>
 
 <div class="page-wrapper">
+    <div class="wrapper4">
     <form action="{% url 'box' %}" method="post" id="box">
         {% csrf_token %}
         <input type="button" id="box-btn" value="BOX" class="hover" disabled>
@@ -38,6 +43,8 @@
         {% csrf_token %}
         <input type="button" value="削除" id="delete-btn" class="hover" disabled>
     </form>
+    </div>
+    <div class="wrapper5">
 {% if items.has_previous %}
     <input type="hidden" value="1">
     <input type="button" class="search right" value="<<最初">
@@ -62,5 +69,6 @@
     <input type="button" class="hover right" value="次へ">
     <input type="button" class="hover left" value="最後>>">
 {% endif %}
+</div>
 </div>
 </div>

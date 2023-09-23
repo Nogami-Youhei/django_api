@@ -104,8 +104,6 @@ async function Search(event, loading, deleteState=false) {
         const checkboxSelector = document.getElementById('checkbox-selector')
         checkboxSelector.addEventListener('click', function checkboxChecker() {
             const checkboxes = document.getElementsByClassName('checkbox');
-            console.log('aaa')
-            console.log(checkboxSelector)
             if (checkboxSelector.checked) {
                 for (let x of Array.from(checkboxes)) {
                     x.checked = true
@@ -123,9 +121,7 @@ async function Search(event, loading, deleteState=false) {
                 e.target.parentElement.firstElementChild.firstElementChild.checked = !e.target.parentElement.firstElementChild.firstElementChild.checked
             }
             const checkboxes = document.getElementsByClassName('checkbox');
-            console.log(checkboxes[0].checked)
             const checkedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
-            console.log(checkedCheckboxes);
 
             if (checkedCheckboxes.length === 1) {
                 const boxBtn = document.getElementById('box-btn')
@@ -134,12 +130,16 @@ async function Search(event, loading, deleteState=false) {
                 const detailBtn = document.getElementById('detail-btn')
                 detailBtn.classList.remove('hover');
                 detailBtn.disabled = false;
-                const updateBtn = document.getElementById('update-btn')
-                updateBtn.classList.remove('hover');
-                updateBtn.disabled = false;
-                const deleteBtn = document.getElementById('delete-btn')
-                deleteBtn.classList.remove('hover');
-                deleteBtn.disabled = false;
+                if (Number(checkedCheckboxes[0].dataset.author)) {
+                    console.log(checkedCheckboxes[0].dataset.author)
+                    const updateBtn = document.getElementById('update-btn')
+                    updateBtn.classList.remove('hover');
+                    updateBtn.disabled = false;
+                    const deleteBtn = document.getElementById('delete-btn')
+                    deleteBtn.classList.remove('hover');
+                    deleteBtn.disabled = false;
+                }
+ 
             } else if (checkedCheckboxes.length === 0) {
                 const boxBtn = document.getElementById('box-btn')
                 boxBtn.classList.add('hover');
@@ -166,6 +166,11 @@ async function Search(event, loading, deleteState=false) {
                 const deleteBtn = document.getElementById('delete-btn')
                 deleteBtn.classList.remove('hover');
                 deleteBtn.disabled = false;
+                if (checkedCheckboxes.map(x => x.dataset.author).includes('0')) {
+                const deleteBtn = document.getElementById('delete-btn')
+                deleteBtn.classList.add('hover');
+                deleteBtn.disabled = true;
+                }
             }
         }
 
