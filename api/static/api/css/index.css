@@ -65,7 +65,8 @@ a {
   position: absolute;
   left: 50%;
   transform: translate(-50%);
-  bottom: -3rem;
+  bottom: 0;
+  transform: translate(-50%, 100%);
 }
 
 .wrapper4 {
@@ -86,7 +87,7 @@ a {
 
 #result > div {
   width: 50vw;
-  min-height: 75vh;
+  min-height: 65vh;
   position: relative;
 }
 
