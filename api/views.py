@@ -244,9 +244,7 @@ def detail(request):
 @login_required
 def delete(request):
     checked_list = request.POST.get('checked_list')
-    print(type(checked_list))
     checked_list = [int(i) for i in checked_list.split(',')]
-    print(checked_list)
     report = Report.objects.filter(id__in=checked_list)
     report.delete()
     return HttpResponse('delete')
