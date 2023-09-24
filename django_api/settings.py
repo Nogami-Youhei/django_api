@@ -104,20 +104,6 @@ DATABASES = {
 # }
 
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         'NAME': 'mugiho$default',
-#         'USER': 'mugiho',
-#         'PASSWORD': 'jGPSiE3CwsfpQqW',
-#         'HOST': 'mugiho.mysql.pythonanywhere-services.com',
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#         },
-#     }
-# }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
